@@ -1,0 +1,55 @@
+Тестовые email адреса для проверки скрипта:
+
+Валидные адреса:
+user@example.com
+john.doe@company.org
+alice+newsletter@domain.net
+bob123@sub.domain.com
+test-user@mail-server.com
+simple@example.org
+my.email+filter@google.com
+name.lastname@corporation.co.uk
+
+Невалидные адреса (не должны быть найдены):
+user@.com                    # домен начинается с точки
+@domain.com                  # нет local-part
+user@domain.                 # домен заканчивается точкой
+user@-domain.com             # домен начинается с минуса
+user@domain-.com             # домен заканчивается минусом
+.user@domain.com             # local-part начинается с точки
+user.@domain.com             # local-part заканчивается точкой
+-user@domain.com             # local-part начинается с минуса
+user-@domain.com             # local-part заканчивается минусом
+user..name@domain.com        # две точки подряд в local-part
+user@domain..com             # две точки подряд в домене
+user@verylongdomainthatexceedsthemaximumallowedlengthof255characterswhichiswaytoomuchforaregulardomainnameandshouldberejectedbythevalidatorbecausethelimitis255charactersinlengthandthisoneismuchlongerthanthat.com
+verylonglocalpartthatexceedsthesixtyfourcharacterlimit@domain.com
+user@localhost               # нет точки в домене
+user@server                  # нет точки в домене
+user@192.168.1.1             # IP адрес (не по нашим правилам)
+user@[IPv6:2001:db8::1]      # IPv6 (не по нашим правилам)
+"strange@address"@domain.com # кавычки (не по нашим правилам)
+
+Адреса в тексте:
+Свяжитесь с нами по email: support@company.com или sales@company.com.
+Для жалоб: abuse@domain.net, для сотрудничества: partner@business.org.
+Мой личный email: firstname.lastname@gmail.com с фильтром firstname.lastname+work@gmail.com.
+
+Граничные случаи:
+boo@ya_ru должен найти только boo@ya
+foo№boo@ya.ru должен найти boo@ya.ru
+address@domain.com. с точкой в конце
+address@domain.com- с минусом в конце
+
+Специальные символы:
+valid+plus@domain.com
+valid-dash@domain.com
+valid.dot@domain.com
+valid_underscore@domain.com # подчеркивание не допускается в домене!
+
+Дубликаты:
+user@example.com
+user@example.com
+alice+newsletter@domain.net
+alice+other@domain.net
+
