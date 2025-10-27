@@ -1,47 +1,66 @@
 #!/bin/bash
 
-# Add timestamp to all log files with country names
-# Expected format: filename_{timestamp}.log
-# For all files with .log extension, add timestamp before the extension
-
-# Check if there are any .log files in the directory
-if [ $(ls *.log 2>/dev/null | wc -l) -eq 0 ]; then
-    echo "Error: No .log files found in current directory"
-    exit 1
-fi
-
-# Get current timestamp in format: YYYYMMDD_HHMMSS
-timestamp=$(date +"%Y%m%d_%H%M%S")
-
-# Process all .log files in current directory
-for file in *.log; do
-    # Check if file exists and is a regular file (not directory)
-    if [ -f "$file" ]; then
-        # Check if file is readable
-        if [ ! -r "$file" ]; then
-            echo "Warning: File $file is not readable. Skipping."
-            continue
-        fi        
-        
-        # Extract filename without extension
-        filename_without_ext="${file%.log}"
-        
-        # Create new filename with timestamp
-        new_filename="${filename_without_ext}_${timestamp}.log"
-        
-        # Check if new filename already exists
-        if [ -e "$new_filename" ]; then
-            echo "Error: Target file $new_filename already exists. Skipping $file"
-            continue
+# Функция для добавления timestamp к .log файлам
+rename_log_files() {
+    for file in *.log; do
+        if [ -f "$file" ]; then
+            # Получаем timestamp в формате YYYYMMDD_HHMMSS
+            timestamp=$(date +%Y%m%d_%H%M%S)
+            # Убираем расширение .log из имени файла
+            basename="${file%.log}"
+            # Переименовываем файл
+            mv "$file" "${basename}_${timestamp}.log"
+            echo "Переименован: $file -> ${basename}_${timestamp}.log"
         fi
-        
-        # Rename the file and check if successful
-        if mv "$file" "$new_filename"; then
-            echo "Success: Renamed: $file -> $new_filename"
-        else
-            echo "Error: Failed to rename $file"
-        fi
+    done
+}
+
+# Функция для добавления хэша коммита к .py файлам
+rename_py_files() {
+    # Проверяем, что это git репозиторий
+    if ! git rev-parse --git-dir > /dev/null 2>&1; then
+        echo "Ошибка: Это не git репозиторий"
+        return 1
     fi
-done
+    
+    # Получаем короткий хэш коммита
+    commit_hash=$(git rev-parse --short HEAD)
+    
+    for file in *.py; do
+        if [ -f "$file" ]; then
+            # Убираем расширение .py из имени файла
+            basename="${file%.py}"
+            # Переименовываем файл
+            mv "$file" "${basename}_${commit_hash}.py"
+            echo "Переименован: $file -> ${basename}_${commit_hash}.py"
+        fi
+    done
+}
 
-echo "File renaming process completed"
+# Основная логика скрипта
+main() {
+    echo "Начало обработки файлов..."
+    
+    # Обрабатываем .log файлы
+    if ls *.log > /dev/null 2>&1; then
+        echo "Обработка .log файлов:"
+        rename_log_files
+    else
+        echo "Файлы .log не найдены"
+    fi
+    
+    echo "---"
+    
+    # Обрабатываем .py файлы
+    if ls *.py > /dev/null 2>&1; then
+        echo "Обработка .py файлов:"
+        rename_py_files
+    else
+        echo "Файлы .py не найдены"
+    fi
+    
+    echo "Обработка завершена!"
+}
+
+# Запускаем основную функцию
+main
