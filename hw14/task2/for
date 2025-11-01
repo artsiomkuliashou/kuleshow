@@ -1,0 +1,7 @@
+IFS=$'\n'
+for line in $(cat /var/users)
+do
+username=$(echo $line | cut -d' ' -f1)
+groupname=$(echo $line | cut -d' ' -f2)
+echo Username: $username Group: $groupname
+done
