@@ -1,0 +1,4 @@
+SELECT st_name, course_name
+FROM students
+LEFT JOIN courses
+on students.st_id = courses.st_id;
