@@ -1,0 +1,2 @@
+[staging_servers]
+linux ansible_host=192.168.0.144 ansible_user=artem-kuleshow ansible_ssh_private_key=/home/artem-kuleshow/.ssh/id_rsa
