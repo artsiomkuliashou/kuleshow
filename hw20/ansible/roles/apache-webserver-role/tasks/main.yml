@@ -1,0 +1,28 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for apache-webserver-role
+- name: Include OS-specific variables
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution | lower }}_{{ ansible_distribution_major_version | lower }}.yml"
+    - "{{ ansible_distribution | lower }}.yml"
+    - "{{ ansible_os_family | lower }}.yml"
+
+- name: Install Apache package
+  ansible.builtin.package:
+    name: "{{ apache_package }}"
+    state: present
+
+- name: Create application directory
+  ansible.builtin.file:
+    path: "{{ app_path }}"
+    state: directory
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    mode: '0755'
+
+- name: Ensure Apache service is enabled and started
+  ansible.builtin.service:
+    name: "{{ apache_service }}"
+    state: started
+    enabled: true
